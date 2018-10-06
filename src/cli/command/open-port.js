@@ -3,7 +3,7 @@ const logger = require('../util/logger.js');
 
 module.exports = function (vorpal) {
   vorpal
-    .command('open <port>', 'Open port to accept incoming connections. Eg: open 2727')
+    .command('open <port>', 'Open port to accept incoming connections. Eg: open 12345')
     .alias('o')
     .action(function(args, callback) {
       if (args.port) {

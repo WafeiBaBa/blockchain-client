@@ -103,18 +103,30 @@ class PeerToPeer {
 
   handleBlockchainResponse(message) {
     const receivedBlocks = JSON.parse(message.data).sort((b1, b2) => (b1.index - b2.index));
+
+    // compare the received latest block and the latest block in host
     const latestBlockReceived = receivedBlocks[receivedBlocks.length - 1];
     const latestBlockHeld = blockchain.latestBlock;
 
+    // single block or a chain
     const blockOrChain = receivedBlocks.length === 1 ? 'single block' : 'blockchain';
     logger.log(`⬇  Peer sent over ${blockOrChain}.`);
 
+    // the host blockchain is newer
     if (latestBlockReceived.index <= latestBlockHeld.index) {
       logger.log(`💤  Received latest block is not longer than current blockchain. Do nothing`)
       return null;
     }
 
+    // the received block is newer
     logger.log(`🐢  Blockchain possibly behind. Received latest block is #${latestBlockReceived.index}. Current latest block is #${latestBlockHeld.index}.`);
+    
+
+    /* 
+    * 1. previousHash is matched the host blockchain -> append the received block
+    * 2. receive a single block
+    * 3. peer blockchain is longer than current blockchain
+    */
     if (latestBlockHeld.hash === latestBlockReceived.previousHash) {
       logger.log(`👍  Previous hash received is equal to current hash. Append received block to blockchain.`)
       blockchain.addBlockFromPeer(latestBlockReceived)

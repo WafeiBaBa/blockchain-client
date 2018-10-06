@@ -3,7 +3,7 @@ const CryptoJS = require('crypto-js');
 const logger = require('../cli/util/logger');
 const spinner = require('../cli/util/spinner');
 const logBlockchain = require('../cli/util/table');
-const InCache = require('incache')
+const InCache = require('incache');
 // const level = require('level');
 // const chainDB = './chainData';
 // const db = level(chainDB);
@@ -95,19 +95,30 @@ class Blockchain {
 
   addBlock (newBlock) {
     if (this.isValidNewBlock(newBlock, this.latestBlock)) {
+      this.blockchain.push(newBlock);
+
       let newIndexString = newBlock.index.toString()
       this.db.set(newIndexString, newBlock.toString())
-      this.blockchain.push(newBlock);
       return true;
     }
     return false;
   }
 
+  // from peer
   addBlockFromPeer(json) {
     if (this.isValidNewBlock(json, this.latestBlock)) {
-      this.blockchain.push(new Block(
-        json.index, json.previousHash, json.timestamp, json.data, json.hash, json.nonce
-      ))
+      let newBlock = new Block(
+        json.index, 
+        json.previousHash, 
+        json.timestamp, 
+        json.data, 
+        json.hash, 
+        json.nonce
+      )
+      this.blockchain.push(newBlock)
+
+      let newIndexString = newBlock.index.toString()
+      this.db.set(newIndexString, newBlock.toString())
     }
   }
 
