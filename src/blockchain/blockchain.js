@@ -46,7 +46,7 @@ class Blockchain {
   }
 
   get () {
-    return Blockchain.newBlockChain()
+    return this.blockchain
   }
 
   get latestBlock () {
@@ -75,10 +75,16 @@ class Blockchain {
     this.blockchain = newBlocks.map(json => new Block(
       json.index, json.previousHash, json.timestamp, json.data, json.hash, json.nonce
     ))
+
+    this.blockchain.forEach(newBlock => {
+      let newIndexString = newBlock.index.toString()
+      this.db.set(newIndexString, newBlock.toString())
+    });
   }
 
+  // validate the received chain
   isValidChain (blockchainToValidate) {
-    if (JSON.stringify(blockchainToValidate[0]) !== JSON.stringify(Block.genesis)) {
+    if ((blockchainToValidate[0].hash) !== (Block.genesis.hash)) {
       return false
     }
 

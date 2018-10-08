@@ -16,6 +16,7 @@ class PeerToPeer {
     this.peers = [];
   }
 
+  // start a server
   startServer (port) {
     const server = net.createServer(socket => p2p.accept(socket, (err, connection) => {
       if (err) {
@@ -28,6 +29,7 @@ class PeerToPeer {
     logger.log(`📡  listening to peers on ${server.address().address}:${server.address().port}... `);
   }
 
+  // connect to a peer server
   connectToPeer(host, port) {
     const socket = net.connect(port, host, () => p2p.connect(socket, (err, connection) => {
       if (err) {
@@ -102,6 +104,7 @@ class PeerToPeer {
   }
 
   handleBlockchainResponse(message) {
+    // const receivedBlocks = JSON.parse(message.data).sort();
     const receivedBlocks = JSON.parse(message.data).sort((b1, b2) => (b1.index - b2.index));
 
     // compare the received latest block and the latest block in host

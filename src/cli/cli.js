@@ -7,7 +7,7 @@ module.exports = function (vorpal) {
     .use(require('./command/open-port.js'))
     .use(require('./command/connect-peer.js'))
     .use(require('./command/list-peers.js'))
-    .use(require('./command/discover-peers.js'))
+    // .use(require('./command/discover-peers.js'))
     .use(require('./util/welcome.js'))
     .delimiter('blockchain →')
     .show()

@@ -16,3 +16,6 @@ npm install --save
 node ./index.js
 ```
 
+## Reference
+
+https://github.com/seanjameshan/blockchain-cli
