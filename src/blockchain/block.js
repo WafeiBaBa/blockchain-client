@@ -1,4 +1,6 @@
 module.exports = class Block {
+
+  // genesis block
   static get genesis () {
     return new Block(
       0,

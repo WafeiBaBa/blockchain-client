@@ -11,7 +11,7 @@ const InCache = require('incache');
 class Blockchain {
   constructor () {
     this.blockchain = [];
-    this.difficulty = 4
+    this.difficulty = 2
   }
 
   static newBlockChain() {
@@ -175,96 +175,6 @@ class Blockchain {
     }
     return i === this.difficulty;
   }
-
-  // async getBlock(index){
-  //   return JSON.parse(await this.getBlockFromDB(index))
-  // }
-
-  // getBlockFromDB(key){
-  //   return new Promise((resolve,reject) => {
-  //       db.get(key,(error,value) => {
-  //         if (error) {
-  //           reject(error);
-  //         }
-  //         resolve(value);
-  //       })
-  //     })
-  // }
-
-  // async addBlock(newBlock){
-  //   if (newBlock.index > 0) {
-  //       if (this.isValidNewBlock(newBlock, this.latestBlock)) {
-  //           await this.addBlockToDB(newBlock.index, JSON.stringify(newBlock));
-  //           this.blockchain.push(newBlock);
-  //           return true
-  //       }else {
-  //           return false
-  //       }
-  //   }else if (newBlock.index == 0) {
-  //       await this.addBlockToDB(newBlock.index, JSON.stringify(newBlock));
-  //       return true
-  //   }
-  // }
-
-  // addBlockToDB(key,value){
-  //   // db.put(key, value, function(err) {
-  //   //   if (err) return console.log('Block ' + key + ' submission failed', err);
-  //   // })
-  //   return new Promise((resolve, reject) => {
-  //     db.put(key,value,(error) => {
-  //       if (error) {
-  //         reject(error);
-  //       }
-  //       resolve(`Add block #${key}`);
-  //     })
-  //   })
-  // }
-
-  // async getBlockIndex(){
-  //   return await this.getBlockIndexFromDB()
-  // }
-
-  // getBlockIndexFromDB(){
-  //   return new Promise((resolve,reject) => {
-  //       let index = -1;
-  //       db.createReadStream().on('data',(data) => {
-  //         index++
-  //       }).on('error',(error) => {
-  //         reject(error)
-  //       }).on('close',() => {
-  //         resolve(index)
-  //       })
-  //     })
-  // }
-
-  // loadBlockFromDB(){
-  //   return new Promise((resolve, reject) => {
-  //     db.createReadStream().on('data',(data) => {
-  //       this.blockchain.push(JSON.parse(data.value))
-  //     }).on('error',(error) => {
-  //         reject(error)
-  //     }).on('close',() => {
-  //         resolve(this.blockchain)
-  //     })
-  //   })
-  // }
 }
-
-// function newBlockChain() {
-//   return db.get('l')
-//     .then(() => {
-//       return Promise.resolve(new BlockChain(db));
-//     })
-//     .catch((e) => {
-//       const genesis = BlockChain.newGenesisBlock();
-//       return db.put('l', genesis.hash)
-//         .then(() => {
-//           return db.put(genesis.hash, genesis.serialize());
-//         })
-//         .then(() => {
-//           return Promise.resolve(new BlockChain(db));
-//         })
-//     })
-// }
 
 module.exports = Blockchain.newBlockChain()
