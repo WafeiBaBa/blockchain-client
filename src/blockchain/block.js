@@ -5,8 +5,8 @@ module.exports = class Block {
     return new Block(
       0,
       '0',
-      new Date().getTime() / 1000,
-      'Welcome to Blockchain Client!',
+      new Date().getTime(),
+      'Genesis Block',
       '0000018035a828da0878ae92ab6fbb16be1ca87a02a3feaa9e3c2b6871931046',
       12345
     )
@@ -14,7 +14,7 @@ module.exports = class Block {
   constructor (
     index = 0,
     previousHash = '0',
-    timestamp = new Date().getTime() / 1000,
+    timestamp = new Date().getTime(),
     data = '',
     hash = '',
     nonce = 0

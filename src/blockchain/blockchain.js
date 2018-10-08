@@ -158,7 +158,7 @@ class Blockchain {
   generateNextBlock (blockData) {
     const previousBlock = this.latestBlock;
     const nextIndex = previousBlock.index + 1;
-    const nextTimestamp = new Date().getTime() / 1000;
+    const nextTimestamp = new Date().getTime();
     let nonce = 0;
     let nextHash = '';
     const randSpinner = spinner.getRandomSpinner();
