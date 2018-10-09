@@ -7,7 +7,10 @@ module.exports = function (vorpal) {
     .alias('m')
     .action(function(args, callback) {
       if (args.data) {
-        blockchain.mine(args.data);
+        let dataInputs = []
+        dataInputs.push(args.data)
+        console.log(dataInputs)
+        blockchain.mine(dataInputs);
         p2p.broadcastLatest(); 
       }
       callback();

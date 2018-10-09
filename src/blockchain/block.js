@@ -6,7 +6,7 @@ module.exports = class Block {
       0,
       '0',
       new Date().getTime(),
-      'Genesis Block',
+      ['Genesis Block', 'I am Wafei! welcome to the blockchain world!'],
       '0000018035a828da0878ae92ab6fbb16be1ca87a02a3feaa9e3c2b6871931046',
       12345
     )
@@ -15,7 +15,7 @@ module.exports = class Block {
     index = 0,
     previousHash = '0',
     timestamp = new Date().getTime(),
-    data = '',
+    transactionDatas = [],
     hash = '',
     nonce = 0
   ) 
@@ -23,7 +23,7 @@ module.exports = class Block {
     this.index = index
     this.previousHash = previousHash.toString()
     this.timestamp = timestamp
-    this.data = data
+    this.transactionDatas = transactionDatas
     this.hash = hash.toString()
     this.nonce = nonce
   }
@@ -38,7 +38,7 @@ module.exports = class Block {
       payload.index,
       payload.previousHash, 
       payload.timestamp, 
-      payload.data, 
+      payload.transactionDatas, 
       payload.hash, 
       payload.nonce
     );

@@ -4,9 +4,6 @@ const logger = require('../cli/util/logger');
 const spinner = require('../cli/util/spinner');
 const logBlockchain = require('../cli/util/table');
 const InCache = require('incache');
-// const level = require('level');
-// const chainDB = './chainData';
-// const db = level(chainDB);
 
 class Blockchain {
   constructor () {
@@ -42,6 +39,8 @@ class Blockchain {
     }
     bc.db = store;
 
+
+    console.log(bc.blockchain.toString())
     return bc
   }
 
@@ -73,7 +72,7 @@ class Blockchain {
 
     logger.log('✅  Received blockchain is valid. Replacing current blockchain with received blockchain');
     this.blockchain = newBlocks.map(json => new Block(
-      json.index, json.previousHash, json.timestamp, json.data, json.hash, json.nonce
+      json.index, json.previousHash, json.timestamp, json.transactionDatas, json.hash, json.nonce
     ))
 
     this.blockchain.forEach(newBlock => {
@@ -117,7 +116,7 @@ class Blockchain {
         json.index, 
         json.previousHash, 
         json.timestamp, 
-        json.data, 
+        json.transactionDatas, 
         json.hash, 
         json.nonce
       )
@@ -129,11 +128,13 @@ class Blockchain {
   }
 
   calculateHashForBlock (block) {
-    return this.calculateHash(block.index, block.previousHash, block.timestamp, block.data, block.nonce)
+    return this.calculateHash(block.index, block.previousHash, 
+      block.timestamp, block.transactionDatas, block.nonce)
   }
 
-  calculateHash (index, previousHash, timestamp, data, nonce) {
-    return CryptoJS.SHA256(index + previousHash + timestamp + data + nonce).toString()
+  calculateHash (index, previousHash, timestamp, transactionDatas, nonce) {
+    return CryptoJS.SHA256(index + previousHash + 
+      timestamp + this.hashTransactions(transactionDatas) + nonce).toString()
   }
 
   isValidNewBlock (newBlock, previousBlock) {
@@ -155,7 +156,7 @@ class Blockchain {
     return true
   }
 
-  generateNextBlock (blockData) {
+  generateNextBlock (transactionDatas) {
     const previousBlock = this.latestBlock;
     const nextIndex = previousBlock.index + 1;
     const nextTimestamp = new Date().getTime();
@@ -164,11 +165,11 @@ class Blockchain {
     const randSpinner = spinner.getRandomSpinner();
     while(!this.isValidHashDifficulty(nextHash)) {     
       nonce = nonce + 1;
-      nextHash = this.calculateHash(nextIndex, previousBlock.hash, nextTimestamp, blockData, nonce);
+      nextHash = this.calculateHash(nextIndex, previousBlock.hash, nextTimestamp, transactionDatas, nonce);
       spinner.draw(randSpinner);
     }
     spinner.clear();
-    const nextBlock = new Block(nextIndex, previousBlock.hash, nextTimestamp, blockData, nextHash, nonce);
+    const nextBlock = new Block(nextIndex, previousBlock.hash, nextTimestamp, transactionDatas, nextHash, nonce);
     logBlockchain([nextBlock]);
     return nextBlock;
   }
@@ -180,6 +181,14 @@ class Blockchain {
       }
     }
     return i === this.difficulty;
+  }
+
+  hashTransactions(transactionDatas){
+    let data
+    transactionDatas.forEach(transaction => {
+      data += transaction
+    });
+    return CryptoJS.SHA256(data).toString()
   }
 }
 
