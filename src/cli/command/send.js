@@ -17,7 +17,7 @@ module.exports = function (vorpal) {
       let toAddr = obj['toAddress'];
       let value = obj['value'];
   
-      let bc = Blockchain.newBlockChain();
+      let bc = Blockchain;
       
       let tx = Transaction.NewUTXOTransaction(sendAddr, toAddr, value, bc);
       bc.mine([tx]);

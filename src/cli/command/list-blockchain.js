@@ -10,8 +10,8 @@ module.exports = function (vorpal) {
       let obj = new Object(args.options)
       let addr = obj['address'] || "";
       
-      let blockchain = Blockchain.newBlockChain(addr)
-      logBlockchain(blockchain.blockchain)
+      // let blockchain = Blockchain.newBlockChain(addr)
+      logBlockchain(Blockchain.blockchain)
       callback();
     })
 }

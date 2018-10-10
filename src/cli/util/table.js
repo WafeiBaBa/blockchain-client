@@ -7,7 +7,7 @@ function logBlockchain(blockchain) {
     const table = new Table({
       style:{border:[],header:[]},
       wordWrap: true,
-      colWidths:[20,120],
+      colWidths:[20,100],
       rowWiths:30
     });
     const object = JSON.parse(JSON.stringify(block))
@@ -22,28 +22,24 @@ function logBlockchain(blockchain) {
         }
       } 
       else if (key === 'transactionDatas') {
-        let obj = [];
-
-        // console.log(JSON.stringify(object[key]))
         for (let i = 0; i < object[key].length; i++) {
-          obj[i] = {}
-          let txObj = []
           for (const txKey in object[key][i]) {
             if (txKey === 'id') {
-              console.log(JSON.stringify(object[key][i]['id']))
-              obj[i][`📄  ${colors.red('Transaction')} ${colors.red(i.toString())} id`] = JSON.stringify(object[key][i]['id'])
+              let txObj = {}
+              txObj[`📄  ${colors.red('Transaction')} ${colors.red('Id')}`] = JSON.stringify(object[key][i]['id'])
+              table.push(txObj)
             }
             else if (txKey === 'vIn') {
-              console.log(JSON.stringify(object[key][i]['vIn']))
-              obj[i][`📄  ${colors.red('Transaction')} TxInpot`] = JSON.stringify(object[key][i]['vIn'])
+              let txObj = {}
+              txObj[`📄  ${colors.red('Transaction')} ${colors.red('TxInpot')}`] = JSON.stringify(object[key][i]['vIn'])
+              table.push(txObj)
             }
             else if (txKey === 'vOut') {
-              console.log(JSON.stringify(object[key][i]['vOut']))
-              obj[i][`📄  ${colors.red('Transaction')} TxOutput`] = JSON.stringify(object[key][i]['vOut'])
+              let txObj = {}
+              txObj[`📄  ${colors.red('Transaction')} ${colors.red('TxOutpot')}`] = JSON.stringify(object[key][i]['vOut'])
+              table.push(txObj)
             }
           }
-          // obj[i][`📄  ${colors.red('Transaction')} ${colors.red(i.toString())}`] = JSON.stringify(object[key][i])
-          table.push(obj[i])
         }
       }
       else {

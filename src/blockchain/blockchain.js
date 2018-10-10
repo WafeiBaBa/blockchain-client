@@ -230,8 +230,6 @@ class Blockchain {
           }
 
           let out = tx.vOut[outIdx];
-
-          console.log(out)
           
           if (out.canBeUnlockedWith(address)) {
             unspentTXs.push(tx);
@@ -306,4 +304,4 @@ class Blockchain {
 
 }
 
-module.exports = Blockchain
+module.exports = Blockchain.newBlockChain("wafei")
