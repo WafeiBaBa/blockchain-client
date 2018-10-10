@@ -4,6 +4,9 @@ const logger = require('../cli/util/logger');
 const spinner = require('../cli/util/spinner');
 const logBlockchain = require('../cli/util/table');
 const InCache = require('incache');
+const {Transaction,TXInput,TXOutput} = require('./transaction');
+
+const genesisCoinbaseData = "Genesis Block"
 
 class Blockchain {
   constructor () {
@@ -11,7 +14,19 @@ class Blockchain {
     this.difficulty = 2
   }
 
-  static newBlockChain() {
+    // genesis block
+  static genesisBlock(transactionDatas) {
+    return new Block(
+      0,
+     '0',
+      new Date().getTime(),
+      transactionDatas,
+      Block.hashTransactions(transactionDatas),
+      12345
+    )
+  }
+
+  static newBlockChain(address) {
     let store = new InCache({
       storeName: "blockchain",
       autoSave: true,
@@ -22,7 +37,8 @@ class Blockchain {
 
     let blocksNum = store.count()
     if (blocksNum == 0) {
-      let genesis = Block.genesis
+      let transaction = Transaction.NewCoinbaseTX(address, genesisCoinbaseData);
+      let genesis = this.genesisBlock([transaction])
       bc = new Blockchain()
       bc.blockchain.push(genesis)
 
@@ -40,7 +56,7 @@ class Blockchain {
     bc.db = store;
 
 
-    console.log(bc.blockchain.toString())
+    // console.log(bc.blockchain.toString())
     return bc
   }
 
@@ -134,7 +150,7 @@ class Blockchain {
 
   calculateHash (index, previousHash, timestamp, transactionDatas, nonce) {
     return CryptoJS.SHA256(index + previousHash + 
-      timestamp + this.hashTransactions(transactionDatas) + nonce).toString()
+      timestamp + Block.hashTransactions(transactionDatas) + nonce).toString()
   }
 
   isValidNewBlock (newBlock, previousBlock) {
@@ -183,13 +199,111 @@ class Blockchain {
     return i === this.difficulty;
   }
 
-  hashTransactions(transactionDatas){
-    let data
-    transactionDatas.forEach(transaction => {
-      data += transaction
-    });
-    return CryptoJS.SHA256(data).toString()
+  findUnspentTransactions(address) {
+    let unspentTXs = [];
+    let spentTXOs = {};
+
+    for (let blockIndex = 0; blockIndex < this.blockchain.length; blockIndex++) {
+      let block = this.blockchain[blockIndex]
+      
+      for (let i = 0; i < block.transactionDatas.length; i++) {
+        let tx = block.transactionDatas[i];
+        let txId = tx.id;
+
+        for (let outIdx = 0; outIdx < tx.vOut.length; outIdx++) {
+
+          // 如果被花费掉了
+          let needToBreak = false;
+
+          // 任何tx，只要有输入，都会被放在spentTXOs里。在稍下面代码里。这里要判断是否已经花费
+          if (spentTXOs[txId] != null && spentTXOs[txId] != undefined) {
+            for (let j = 0; j < spentTXOs[txId].length; j++) {
+              if (spentTXOs[txId][j] == outIdx) {
+                needToBreak = true;
+                break;
+              }
+            }
+          }
+
+          if (needToBreak) {
+            continue;
+          }
+
+          let out = tx.vOut[outIdx];
+
+          console.log(out)
+          
+          if (out.canBeUnlockedWith(address)) {
+            unspentTXs.push(tx);
+          }
+        }
+
+        if (tx.isCoinbase() == false) {
+          for (let k = 0; k < tx.vIn.length; k ++) {
+            let vIn = tx.vIn[k];
+            if (vIn.canUnlockOutputWith(address)) {
+              let vInId = vIn.txId;
+              if (!spentTXOs[vInId]) {
+                spentTXOs[vInId] = [];
+              }
+              spentTXOs[vInId].push(vIn.vOut);
+            }
+          }
+        }
+      }
+    }
+
+    return unspentTXs;
   }
+
+  findUTXO(address) {
+    let UTXOs = [];
+    let txs = this.findUnspentTransactions(address);
+
+    for (let i = 0; i < txs.length; i ++) {
+      for (let j = 0; j < txs[i].vOut.length; j ++) {
+        if (txs[i].vOut[j].canBeUnlockedWith(address)) {
+          UTXOs.push(txs[i].vOut[j]);
+        }
+      }
+    }
+    return UTXOs;
+  }
+
+  findSpendableOutputs(address, amount) {
+    let unspentOutputs = {};
+    let unspentTxs = this.findUnspentTransactions(address);
+    let accumulated = 0;
+
+    for (let key in unspentTxs) {
+      let tx = unspentTxs[key];
+      let txId = tx.id;
+
+      let needBreak = false;
+      for (let outIdx = 0; outIdx < tx.vOut.length; outIdx ++) {
+        let output = tx.vOut[outIdx];
+        if (output.canBeUnlockedWith(address) && accumulated < amount) {
+          accumulated += output.value;
+          if (!unspentOutputs[txId]) 
+            unspentOutputs[txId] = [];
+          unspentOutputs[txId].push(outIdx);
+          if (accumulated >= amount) {
+            needBreak = true;
+            break;
+          }
+        }
+      }
+
+      if (needBreak)
+        break;
+    }
+
+    return {
+      amount: accumulated,
+      unspentOutputs: unspentOutputs
+    };
+  }
+
 }
 
-module.exports = Blockchain.newBlockChain()
+module.exports = Blockchain

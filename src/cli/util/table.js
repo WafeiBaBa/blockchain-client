@@ -7,9 +7,11 @@ function logBlockchain(blockchain) {
     const table = new Table({
       style:{border:[],header:[]},
       wordWrap: true,
-      colWidths:[20,66]
+      colWidths:[20,120],
+      rowWiths:30
     });
     const object = JSON.parse(JSON.stringify(block))
+    // console.log(JSON.stringify(object))
     for(let key in object) {
       if (key === 'index') {
         const blockNumber = object[key]
@@ -20,11 +22,27 @@ function logBlockchain(blockchain) {
         }
       } 
       else if (key === 'transactionDatas') {
-        // obj[`📄  ${colors.red('Transaction')}`] = object[key].toString()
         let obj = [];
+
+        // console.log(JSON.stringify(object[key]))
         for (let i = 0; i < object[key].length; i++) {
           obj[i] = {}
-          obj[i][`📄  ${colors.red('Transaction')} ${colors.red(i.toString())}`] = object[key][i].toString()
+          let txObj = []
+          for (const txKey in object[key][i]) {
+            if (txKey === 'id') {
+              console.log(JSON.stringify(object[key][i]['id']))
+              obj[i][`📄  ${colors.red('Transaction')} ${colors.red(i.toString())} id`] = JSON.stringify(object[key][i]['id'])
+            }
+            else if (txKey === 'vIn') {
+              console.log(JSON.stringify(object[key][i]['vIn']))
+              obj[i][`📄  ${colors.red('Transaction')} TxInpot`] = JSON.stringify(object[key][i]['vIn'])
+            }
+            else if (txKey === 'vOut') {
+              console.log(JSON.stringify(object[key][i]['vOut']))
+              obj[i][`📄  ${colors.red('Transaction')} TxOutput`] = JSON.stringify(object[key][i]['vOut'])
+            }
+          }
+          // obj[i][`📄  ${colors.red('Transaction')} ${colors.red(i.toString())}`] = JSON.stringify(object[key][i])
           table.push(obj[i])
         }
       }

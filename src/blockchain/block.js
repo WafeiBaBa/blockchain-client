@@ -1,24 +1,9 @@
+const {Transaction} = require('./transaction');
+const CryptoJS = require('crypto-js')
+
 module.exports = class Block {
 
-  // genesis block
-  static get genesis () {
-    return new Block(
-      0,
-      '0',
-      new Date().getTime(),
-      ['Genesis Block', 'I am Wafei! welcome to the blockchain world!'],
-      '0000018035a828da0878ae92ab6fbb16be1ca87a02a3feaa9e3c2b6871931046',
-      12345
-    )
-  }
-  constructor (
-    index = 0,
-    previousHash = '0',
-    timestamp = new Date().getTime(),
-    transactionDatas = [],
-    hash = '',
-    nonce = 0
-  ) 
+  constructor (index, previousHash, timestamp, transactionDatas, hash, nonce) 
   {
     this.index = index
     this.previousHash = previousHash.toString()
@@ -42,6 +27,17 @@ module.exports = class Block {
       payload.hash, 
       payload.nonce
     );
+    let txs = Transaction.TxsFromString(payload.transactionDatas);
+    block.transactionDatas = txs;
     return block;
+  }
+  
+
+  static hashTransactions(transactionDatas){
+    let data
+    transactionDatas.forEach(transaction => {
+      data += transaction
+    });
+    return CryptoJS.SHA256(data).toString()
   }
 }
