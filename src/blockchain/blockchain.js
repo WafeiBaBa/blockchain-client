@@ -85,8 +85,9 @@ class Blockchain {
     }
 
     logger.log('✅  Received blockchain is valid. Replacing current blockchain with received blockchain');
+
     this.blockchain = newBlocks.map(json => new Block(
-      json.index, json.previousHash, json.timestamp, json.transactionDatas, json.hash, json.nonce
+      json.index, json.previousHash, json.timestamp, Transaction.txsFromString(json.transactionDatas), json.hash, json.nonce
     ));
 
     this.blockchain.forEach(newBlock => {
@@ -126,11 +127,12 @@ class Blockchain {
   // from peer
   addBlockFromPeer(json) {
     if (this.isValidNewBlock(json, this.latestBlock)) {
+      let txs = Transaction.txsFromString(json.transactionDatas);
       let newBlock = new Block(
         json.index, 
         json.previousHash, 
         json.timestamp, 
-        json.transactionDatas, 
+        txs,
         json.hash, 
         json.nonce
       );
@@ -141,18 +143,18 @@ class Blockchain {
     }
   }
 
-  calculateHashForBlock (block) {
-    return this.calculateHash(block.index, block.previousHash, 
+  static calculateHashForBlock (block) {
+    return Blockchain.calculateHash(block.index, block.previousHash,
       block.timestamp, block.transactionDatas, block.nonce)
   }
 
-  calculateHash (index, previousHash, timestamp, transactionDatas, nonce) {
+  static calculateHash (index, previousHash, timestamp, transactionDatas, nonce) {
     return CryptoJS.SHA256(index + previousHash + 
       timestamp + Block.hashTransactions(transactionDatas) + nonce).toString()
   }
 
   isValidNewBlock (newBlock, previousBlock) {
-    const blockHash = this.calculateHashForBlock(newBlock);
+    const blockHash = Blockchain.calculateHashForBlock(newBlock);
 
     if (previousBlock.index + 1 !== newBlock.index) {
       logger.log('❌  new block has invalid index');
@@ -163,8 +165,8 @@ class Blockchain {
     } else if (blockHash !== newBlock.hash) {
       logger.log(`❌  invalid hash: ${blockHash} ${newBlock.hash}`);
       return false
-    } else if (!this.isValidHashDifficulty(this.calculateHashForBlock(newBlock))) {
-      logger.log(`❌  invalid hash does not meet difficulty requirements: ${this.calculateHashForBlock(newBlock)}`);
+    } else if (!this.isValidHashDifficulty(Blockchain.calculateHashForBlock(newBlock))) {
+      logger.log(`❌  invalid hash does not meet difficulty requirements: ${Blockchain.calculateHashForBlock(newBlock)}`);
       return false;
     }
     return true
@@ -179,7 +181,7 @@ class Blockchain {
     const randSpinner = spinner.getRandomSpinner();
     while(!this.isValidHashDifficulty(nextHash)) {     
       nonce = nonce + 1;
-      nextHash = this.calculateHash(nextIndex, previousBlock.hash, nextTimestamp, transactionDatas, nonce);
+      nextHash = Blockchain.calculateHash(nextIndex, previousBlock.hash, nextTimestamp, transactionDatas, nonce);
       spinner.draw(randSpinner);
     }
     spinner.clear();
@@ -201,7 +203,7 @@ class Blockchain {
     let unspentTXs = [];
     let spentTXOs = {};
 
-    for (let blockIndex = 0; blockIndex < this.blockchain.length; blockIndex++) {
+    for (let blockIndex = this.blockchain.length -1 ; blockIndex >= 0 ; blockIndex--) {
       let block = this.blockchain[blockIndex];
       
       for (let txIndex = 0; txIndex < block.transactionDatas.length; txIndex++) {
@@ -294,10 +296,10 @@ class Blockchain {
         break;
     }
 
-    console.log({
-        amount: accumulated,
-        unspentOutputs: unspentOutputs
-    });
+    // console.log({
+    //     amount: accumulated,
+    //     unspentOutputs: unspentOutputs
+    // });
     return {
       amount: accumulated,
       unspentOutputs: unspentOutputs

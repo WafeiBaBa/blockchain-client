@@ -1,4 +1,3 @@
-const Hashes    = require('jshashes');
 const CryptoJS = require('crypto-js');
 
 const SUBSIDY = 10;
@@ -11,7 +10,7 @@ class Transaction {
   }
 
   static txsFromString(data) {
-    if (typeof data == 'string') {
+    if (typeof data === 'string') {
       data = JSON.parse(data);
     }
 
@@ -89,10 +88,8 @@ class Transaction {
   }
 
   setId() {
-    let sha256 = new Hashes.SHA256();
     let data = JSON.stringify(this);
-    let hash = sha256.hex(data);
-    this.id = hash;
+    this.id = CryptoJS.SHA256(data).toString();
   }
 
   isCoinBase() {
