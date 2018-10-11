@@ -9,6 +9,7 @@ class Transaction {
     this.vOut = [];
   }
 
+  // from json string to object
   static txsFromString(data) {
     if (typeof data === 'string') {
       data = JSON.parse(data);
@@ -19,11 +20,14 @@ class Transaction {
       let payload = data[key];
       let tx = new Transaction();
       tx.id = payload.id;
+
+      // create txInput
       for( let j in payload.vIn) {
         let txInput = new TXInput(payload.vIn[j].txId, payload.vIn[j].vOut, payload.vIn[j].scriptSig);
         tx.vIn.push(txInput);
       }
 
+      // create txOutput
       for( let i in payload.vOut) {
         let txOutput = new TXOutput(payload.vOut[i].value, payload.vOut[i].scriptPubKey);
         tx.vOut.push(txOutput);
@@ -35,6 +39,7 @@ class Transaction {
     return txs;
   }
 
+  // create coinbase transaction
   static newCoinBaseTX(to, data) {
     if (!data || data === '') {
       data = `Reward to ${to}`;
@@ -51,6 +56,7 @@ class Transaction {
     return transaction; 
   }
 
+  // create new unspent transaction output
   static newUTXOTransaction(from, to, amount, bc) {
     let inputs = [];
     let outputs = [];
@@ -99,7 +105,11 @@ class Transaction {
 
 class TXOutput {
   constructor(value, scriptPubKey) {
+
+    // output value
     this.value = parseInt(value);
+
+    // the signature
     this.scriptPubKey = scriptPubKey;
   }
 
@@ -110,12 +120,18 @@ class TXOutput {
 
 class TXInput {
   constructor(txId, vOut, scriptSig) {
-    this.txId = txId; // 一个交易输入引用了之前一笔交易的一个输出, ID 表明是之前哪笔交易
-    this.vOut = vOut; // 一笔交易可能有多个输出，Vout 为输出的索引
+
+    // can detect the output
+    this.txId = txId;
+
+    // the index of output
+    this.vOut = vOut;
+
+    // the input address
     this.scriptSig = scriptSig;
   }
 
-  // unlockingData 理解为地址
+  // unlockingData means address
   canUnlockOutputWith(unlockingData) {
     return this.scriptSig === unlockingData;
   }

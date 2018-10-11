@@ -14,7 +14,7 @@ class Blockchain {
     this.difficulty = 2
   }
 
-    // genesis block
+  // genesis block
   static genesisBlock(transactionDatas) {
     return new Block(
       0,
@@ -26,6 +26,7 @@ class Blockchain {
     )
   }
 
+  // create a new chain or load the chain from database
   static newBlockChain(address) {
     let store = new InCache({
       storeName: "blockchain",
@@ -58,6 +59,7 @@ class Blockchain {
     return bc
   }
 
+  // get the current blockchain instance
   get () {
     return this.blockchain
   }
@@ -73,6 +75,7 @@ class Blockchain {
     }
   }
 
+  // replace the whole chain and store in database
   replaceChain (newBlocks) {
     if (!this.isValidChain(newBlocks)) {
       logger.log("❌ Replacement chain is not valid. Won't replace existing blockchain.");
@@ -113,6 +116,7 @@ class Blockchain {
     return true
   }
 
+  // add a new block to the chain
   addBlock (newBlock) {
     if (this.isValidNewBlock(newBlock, this.latestBlock)) {
       this.blockchain.push(newBlock);
@@ -124,7 +128,7 @@ class Blockchain {
     return false;
   }
 
-  // from peer
+  // add block from peer
   addBlockFromPeer(json) {
     if (this.isValidNewBlock(json, this.latestBlock)) {
       let txs = Transaction.txsFromString(json.transactionDatas);
@@ -143,6 +147,7 @@ class Blockchain {
     }
   }
 
+  // set the block hash
   static calculateHashForBlock (block) {
     return Blockchain.calculateHash(block.index, block.previousHash,
       block.timestamp, block.transactionDatas, block.nonce)
@@ -153,6 +158,8 @@ class Blockchain {
       timestamp + Block.hashTransactions(transactionDatas) + nonce).toString()
   }
 
+
+  // validate the new block
   isValidNewBlock (newBlock, previousBlock) {
     const blockHash = Blockchain.calculateHashForBlock(newBlock);
 
@@ -172,6 +179,7 @@ class Blockchain {
     return true
   }
 
+  // generate next block by proof of work
   generateNextBlock (transactionDatas) {
     const previousBlock = this.latestBlock;
     const nextIndex = previousBlock.index + 1;
@@ -190,6 +198,7 @@ class Blockchain {
     return nextBlock;
   }
 
+  // compare the new hash and the difficulty value
   isValidHashDifficulty(hash) {
     for (var i = 0, b = hash.length; i < b; i ++) {
       if (hash[i] !== '0') {
@@ -199,6 +208,7 @@ class Blockchain {
     return i === this.difficulty;
   }
 
+  // find unspent transactions
   findUnspentTransactions(address) {
     let unspentTXs = [];
     let spentTXOs = {};
@@ -212,10 +222,10 @@ class Blockchain {
 
         for (let outIndex = 0; outIndex < tx.vOut.length; outIndex++) {
 
-          // 如果被花费掉了
+          // if the output spent, then break
           let needToBreak = false;
 
-          // 任何tx，只要有输入，都会被放在spentTXOs里。在稍下面代码里。这里要判断是否已经花费
+          // determine whether the output is being spent
           if (spentTXOs[txId] != null && spentTXOs[txId] !== undefined) {
             for (let j = 0; j < spentTXOs[txId].length; j++) {
               if (spentTXOs[txId][j] === outIndex) {
@@ -229,6 +239,7 @@ class Blockchain {
             continue;
           }
 
+          // if not be spent, put into the unspentTXs
           let out = tx.vOut[outIndex];
           
           if (out.canBeUnlockedWith(address)) {
@@ -236,6 +247,7 @@ class Blockchain {
           }
         }
 
+        // if the transaction is not the coinbase transaction, calculate the input
         if (tx.isCoinBase() === false) {
           for (let inputIndex = 0; inputIndex < tx.vIn.length; inputIndex ++) {
             let vIn = tx.vIn[inputIndex];
@@ -250,10 +262,10 @@ class Blockchain {
         }
       }
     }
-    // console.log(JSON.stringify(unspentTXs));
     return unspentTXs;
   }
 
+  // find the unspent transaction outputs
   findUTXO(address) {
     let UTXOs = [];
     let txs = this.findUnspentTransactions(address);
@@ -268,6 +280,7 @@ class Blockchain {
     return UTXOs;
   }
 
+  // find the spendable outputs
   findSpendableOutputs(address, amount) {
     let unspentOutputs = {};
     let unspentTxs = this.findUnspentTransactions(address);
@@ -296,10 +309,6 @@ class Blockchain {
         break;
     }
 
-    // console.log({
-    //     amount: accumulated,
-    //     unspentOutputs: unspentOutputs
-    // });
     return {
       amount: accumulated,
       unspentOutputs: unspentOutputs

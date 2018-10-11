@@ -1,4 +1,4 @@
-const messages = require('./messages/messages');
+const Messages = require('./messages/messages');
 const {
   QUERY_LATEST,
   QUERY_ALL,
@@ -41,21 +41,12 @@ class PeerToPeer {
     }));
   }
 
-  discoverPeers() {
-    p2p.getNewPeer((err) => {
-      if (err) {
-        logger.log(`❗  ${err}`);
-      } else {
-        logger.log('👀  Discovered new peers.') //todo
-      }
-    })
-  }
-
+  // init the connection
   initConnection(connection) {
     this.peers.push(connection);
     this.initMessageHandler(connection);
     this.initErrorHandler(connection);
-    this.write(connection, messages.getQueryChainLengthMsg());
+    this.write(connection, Messages.getQueryChainLengthMsg());
   }
 
   initMessageHandler(connection) {
@@ -65,16 +56,24 @@ class PeerToPeer {
     })
   }
 
+
+  // handle the message
   handleMessage(peer, message) {
     switch (message.type) {
+
+      // other peers query the latest block
       case QUERY_LATEST:
         logger.log(`⬇  Peer requested for latest block.`);
-        this.write(peer, messages.getResponseLatestMsg(blockchain));
+        this.write(peer, Messages.getResponseLatestMsg(blockchain));
         break;
+
+      //  other peers query the whole chain
       case QUERY_ALL:
         logger.log("⬇  Peer requested for blockchain.");
-        this.write(peer, messages.getResponseChainMsg(blockchain));
+        this.write(peer, Messages.getResponseChainMsg(blockchain));
         break;
+
+      //  send the single block or whole chain to other peers
       case RESPONSE_BLOCKCHAIN:
         this.handleBlockchainResponse(message);
         break;
@@ -88,21 +87,19 @@ class PeerToPeer {
   }
 
   broadcastLatest () {
-    this.broadcast(messages.getResponseLatestMsg(blockchain))
+    this.broadcast(Messages.getResponseLatestMsg(blockchain))
   }
 
   broadcast(message) {
     this.peers.forEach(peer => this.write(peer, message))
   }
 
+  // send the json string message to other peers
   write(peer, message) {
     peer.write(JSON.stringify(message));
   }
 
-  closeConnection() {
-
-  }
-
+  // handle the response message from other peers
   handleBlockchainResponse(message) {
     // const receivedBlocks = JSON.parse(message.data).sort();
     const receivedBlocks = JSON.parse(message.data).sort((b1, b2) => (b1.index - b2.index));
@@ -127,23 +124,22 @@ class PeerToPeer {
 
     /* 
     * 1. previousHash is matched the host blockchain -> append the received block
-    * 2. receive a single block
-    * 3. peer blockchain is longer than current blockchain
+    * 2. receive a single block which does not matched -> query for whole chain from peers
+    * 3. peer blockchain is longer than current blockchain -> query for whole chain from peers
     */
     if (latestBlockHeld.hash === latestBlockReceived.previousHash) {
       logger.log(`👍  Previous hash received is equal to current hash. Append received block to blockchain.`);
       blockchain.addBlockFromPeer(latestBlockReceived);
-      this.broadcast(messages.getResponseLatestMsg(blockchain))
+      this.broadcast(Messages.getResponseLatestMsg(blockchain))
     } else if (receivedBlocks.length === 1) {
       logger.log(`🤔  Received previous hash different from current hash. Get entire blockchain from peer.`);
-      this.broadcast(messages.getQueryAllMsg())
+      this.broadcast(Messages.getQueryAllMsg())
     } else {
       logger.log(`⛓  Peer blockchain is longer than current blockchain.`);
       blockchain.replaceChain(receivedBlocks);
-      this.broadcast(messages.getResponseLatestMsg(blockchain))
+      this.broadcast(Messages.getResponseLatestMsg(blockchain))
     }
   }
 }
-
 
 module.exports = new PeerToPeer();

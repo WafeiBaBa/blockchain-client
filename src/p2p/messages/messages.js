@@ -6,21 +6,21 @@ const {
 const logger = require('../../cli/util/logger');
 
 class Messages {
-  getQueryChainLengthMsg () {
+  static getQueryChainLengthMsg () {
     logger.log('⬆  Asking peer for latest block');
     return {
       type: QUERY_LATEST
     }
   }
 
-  getQueryAllMsg () {
+  static getQueryAllMsg () {
     logger.log('⬆  Asking peer for entire blockchain');
     return {
       type: QUERY_ALL
     }
   }
 
-  getResponseChainMsg (blockchain) {
+  static getResponseChainMsg (blockchain) {
     logger.log('⬆  Sending peer entire blockchain');
     return {
       type: RESPONSE_BLOCKCHAIN,
@@ -28,7 +28,7 @@ class Messages {
     }
   }
 
-  getResponseLatestMsg (blockchain) {
+  static getResponseLatestMsg (blockchain) {
     logger.log('⬆  Sending peer latest block');
     return {
       type: RESPONSE_BLOCKCHAIN,
@@ -39,5 +39,4 @@ class Messages {
   }
 }
 
-const messages = new Messages();
-module.exports = messages;
+module.exports = Messages;

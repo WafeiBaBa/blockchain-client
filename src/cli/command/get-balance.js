@@ -12,7 +12,8 @@ module.exports = function (vorpal) {
       
         let addr = obj['address'] || "";
         let UTXOs = blockchain.findUTXO(addr);
-        // logger.log(UTXOs);
+
+        // calculate the amount of some address
         let amount = 0;
         for (let i = 0; i < UTXOs.length; i ++) {
           amount += UTXOs[i].value;

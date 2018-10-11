@@ -17,10 +17,12 @@ module.exports = class Block {
     this.nonce = nonce
   }
 
+  // from object to string
   toString() {
     return JSON.stringify(this);
   }
 
+  // from string to object
   static fromString(data) {
     let payload = JSON.parse(data);
     let block = new Block(
@@ -36,6 +38,7 @@ module.exports = class Block {
   }
   
 
+  // hash the transactions data using merkle tree
   static hashTransactions(transactionDatas){
     let data = [];
     transactionDatas.forEach(transaction => {
