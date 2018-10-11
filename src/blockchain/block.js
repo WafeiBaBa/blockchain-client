@@ -1,15 +1,15 @@
 const {Transaction} = require('./transaction');
-const CryptoJS = require('crypto-js')
+const CryptoJS = require('crypto-js');
 
 module.exports = class Block {
 
   constructor (index, previousHash, timestamp, transactionDatas, hash, nonce) 
   {
-    this.index = index
-    this.previousHash = previousHash.toString()
-    this.timestamp = timestamp
-    this.transactionDatas = transactionDatas
-    this.hash = hash.toString()
+    this.index = index;
+    this.previousHash = previousHash.toString();
+    this.timestamp = timestamp;
+    this.transactionDatas = transactionDatas;
+    this.hash = hash.toString();
     this.nonce = nonce
   }
 
@@ -27,17 +27,16 @@ module.exports = class Block {
       payload.hash, 
       payload.nonce
     );
-    let txs = Transaction.TxsFromString(payload.transactionDatas);
-    block.transactionDatas = txs;
+    block.transactionDatas = Transaction.txsFromString(payload.transactionDatas);
     return block;
   }
   
 
   static hashTransactions(transactionDatas){
-    let data
+    let data;
     transactionDatas.forEach(transaction => {
       data += transaction
     });
     return CryptoJS.SHA256(data).toString()
   }
-}
+};

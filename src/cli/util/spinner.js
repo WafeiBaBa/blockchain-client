@@ -86,7 +86,7 @@ const spinners = {
       "🍍 "
     ]
   }
-}
+};
 
 module.exports = (function() {
   let index = 0;
@@ -96,7 +96,7 @@ module.exports = (function() {
   }
   
   function draw(randomSpinner) {
-    const sequence = spinners[randomSpinner].frames
+    const sequence = spinners[randomSpinner].frames;
     index++;
     index = (index < sequence.length - 1) ? index + 1 : 0;
     if (process.env.NODE_ENV !== "test") {

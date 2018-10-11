@@ -1,4 +1,4 @@
-const messages = require('./messages/messages')
+const messages = require('./messages/messages');
 const {
   QUERY_LATEST,
   QUERY_ALL,
@@ -8,7 +8,7 @@ const wrtc = require('wrtc');
 const Exchange = require('peer-exchange');
 const p2p = new Exchange('blockchain.js', { wrtc: wrtc });
 const net = require('net');
-const blockchain = require('../blockchain/blockchain')
+const blockchain = require('../blockchain/blockchain');
 const logger = require('../cli/util/logger');
 
 class PeerToPeer {
@@ -22,7 +22,7 @@ class PeerToPeer {
       if (err) {
         logger.log(`❗  ${err}`);
       } else {
-        logger.log('👥  A peer has connected to the server!')
+        logger.log('👥  A peer has connected to the server!');
         this.initConnection.call(this, connection)
       }
     })).listen(port);
@@ -69,15 +69,15 @@ class PeerToPeer {
     switch (message.type) {
       case QUERY_LATEST:
         logger.log(`⬇  Peer requested for latest block.`);
-        this.write(peer, messages.getResponseLatestMsg(blockchain))
-        break
+        this.write(peer, messages.getResponseLatestMsg(blockchain));
+        break;
       case QUERY_ALL:
         logger.log("⬇  Peer requested for blockchain.");
-        this.write(peer, messages.getResponseChainMsg(blockchain))
-        break
+        this.write(peer, messages.getResponseChainMsg(blockchain));
+        break;
       case RESPONSE_BLOCKCHAIN:
-        this.handleBlockchainResponse(message)
-        break
+        this.handleBlockchainResponse(message);
+        break;
       default:
         logger.log(`❓  Received unknown message type ${message.type}`)
     }
@@ -117,7 +117,7 @@ class PeerToPeer {
 
     // the host blockchain is newer
     if (latestBlockReceived.index <= latestBlockHeld.index) {
-      logger.log(`💤  Received latest block is not longer than current blockchain. Do nothing`)
+      logger.log(`💤  Received latest block is not longer than current blockchain. Do nothing`);
       return null;
     }
 
@@ -131,15 +131,15 @@ class PeerToPeer {
     * 3. peer blockchain is longer than current blockchain
     */
     if (latestBlockHeld.hash === latestBlockReceived.previousHash) {
-      logger.log(`👍  Previous hash received is equal to current hash. Append received block to blockchain.`)
-      blockchain.addBlockFromPeer(latestBlockReceived)
+      logger.log(`👍  Previous hash received is equal to current hash. Append received block to blockchain.`);
+      blockchain.addBlockFromPeer(latestBlockReceived);
       this.broadcast(messages.getResponseLatestMsg(blockchain))
     } else if (receivedBlocks.length === 1) {
-      logger.log(`🤔  Received previous hash different from current hash. Get entire blockchain from peer.`)
+      logger.log(`🤔  Received previous hash different from current hash. Get entire blockchain from peer.`);
       this.broadcast(messages.getQueryAllMsg())
     } else {
-      logger.log(`⛓  Peer blockchain is longer than current blockchain.`)
-      blockchain.replaceChain(receivedBlocks)
+      logger.log(`⛓  Peer blockchain is longer than current blockchain.`);
+      blockchain.replaceChain(receivedBlocks);
       this.broadcast(messages.getResponseLatestMsg(blockchain))
     }
   }

@@ -1,4 +1,4 @@
-const Blockchain = require('../../blockchain/blockchain');
+const blockchain = require('../../blockchain/blockchain');
 const logBlockchain = require('../util/table.js');
 
 module.exports = function (vorpal) {
@@ -7,11 +7,9 @@ module.exports = function (vorpal) {
     .alias('bc')
     .option('-a, --address [address]','list the blockchain')
     .action(function(args, callback) {
-      let obj = new Object(args.options)
+      let obj = new Object(args.options);
       let addr = obj['address'] || "";
-      
-      // let blockchain = Blockchain.newBlockChain(addr)
-      logBlockchain(Blockchain.blockchain)
+      logBlockchain(blockchain.blockchain);
       callback();
     })
-}
+};

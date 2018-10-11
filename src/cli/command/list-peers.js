@@ -8,7 +8,7 @@ module.exports = function (vorpal) {
     .action(function(args, callback) {
       p2p.peers.forEach(function(peer) {
         logger.log(`👤  ${peer.pxpPeer.socket._host} \n`)
-      })
+      });
       callback();
     })
-}
+};

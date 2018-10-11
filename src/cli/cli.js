@@ -12,4 +12,4 @@ module.exports = function (vorpal) {
     .use(require('./util/welcome.js'))
     .delimiter('blockchain →')
     .show()
-}
+};

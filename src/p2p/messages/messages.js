@@ -39,5 +39,5 @@ class Messages {
   }
 }
 
-const messages = new Messages()
-module.exports = messages
+const messages = new Messages();
+module.exports = messages;

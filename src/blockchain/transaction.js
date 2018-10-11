@@ -1,5 +1,5 @@
 const Hashes    = require('jshashes');
-const BigInteger = require('bigi');
+const CryptoJS = require('crypto-js');
 
 const SUBSIDY = 10;
 
@@ -10,7 +10,7 @@ class Transaction {
     this.vOut = [];
   }
 
-  static TxsFromString(data) {
+  static txsFromString(data) {
     if (typeof data == 'string') {
       data = JSON.parse(data);
     }
@@ -36,8 +36,8 @@ class Transaction {
     return txs;
   }
 
-  static NewCoinbaseTX(to, data) {
-    if (!data || data == '') {
+  static newCoinBaseTX(to, data) {
+    if (!data || data === '') {
       data = `Reward to ${to}`;
     }
 
@@ -52,16 +52,16 @@ class Transaction {
     return transaction; 
   }
 
-  static NewUTXOTransaction(fromAddr, to, amount, bc) {
+  static newUTXOTransaction(from, to, amount, bc) {
     let inputs = [];
     let outputs = [];
 
-    let obj = bc.findSpendableOutputs(fromAddr, amount);
+    let obj = bc.findSpendableOutputs(from, amount);
     let acc = obj.amount;
     let unspentOutputs = obj.unspentOutputs;
 
     if (acc < amount) {
-      console.log(`ERROR: Not enough funds`);
+      console.error(`ERROR: Not enough funds`);
       return;
     }
 
@@ -69,7 +69,7 @@ class Transaction {
       let outs = unspentOutputs[txId];
       for (let key in outs) {
         let outIdx = outs[key];
-        let input = new TXInput(txId, outIdx, fromAddr);
+        let input = new TXInput(txId, outIdx, from);
         inputs.push(input);
       }
     }
@@ -77,7 +77,7 @@ class Transaction {
     outputs.push(new TXOutput(amount, to));
 
     if (acc > amount) {
-      outputs.push(new TXOutput(acc - amount, fromAddr));
+      outputs.push(new TXOutput(acc - amount, from));
     }
 
     let tx = new Transaction();
@@ -95,8 +95,8 @@ class Transaction {
     this.id = hash;
   }
 
-  isCoinbase() {
-    return this.vIn.length == 1 && this.vIn[0].txId == 0 && this.vIn[0].vOut == -1;
+  isCoinBase() {
+    return this.vIn.length === 1 && this.vIn[0].txId === 0 && this.vIn[0].vOut === -1;
   }
 }
 
@@ -107,7 +107,7 @@ class TXOutput {
   }
 
   canBeUnlockedWith(unlockingData) {
-    return this.scriptPubKey == unlockingData;
+    return this.scriptPubKey === unlockingData;
   }
 }
 
@@ -120,7 +120,7 @@ class TXInput {
 
   // unlockingData 理解为地址
   canUnlockOutputWith(unlockingData) {
-    return this.scriptSig == unlockingData;  
+    return this.scriptSig === unlockingData;
   }
 
 
