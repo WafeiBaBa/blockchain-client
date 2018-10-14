@@ -19,3 +19,4 @@ node ./index.js
 ## Reference
 
 https://github.com/seanjameshan/blockchain-cli
+https://github.com/Jeiwan/blockchain_go
