@@ -19,10 +19,14 @@ module.exports = function (vorpal) {
   
       let bc = blockchain;
       
-      let tx = Transaction.newUTXOTransaction(sendAddress, toAddrress, value, bc);
-      bc.mine([tx]);
-  
-      p2p.broadcastLatest();
+      try {
+        let tx = Transaction.newUTXOTransaction(sendAddress, toAddrress, value, bc);
+        bc.mine([tx]);
+        p2p.broadcastLatest();
+      } catch (e) {
+        console.log(e.message);
+      }
+
       callback();
     })
 };

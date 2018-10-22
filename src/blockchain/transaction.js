@@ -69,7 +69,7 @@ class Transaction {
     if (acc < amount) {
       // console.error(`ERROR: Not enough funds`);
       logger.log(`❌ ERROR: Not enough funds`)
-      return;
+      throw new Error('Not enough funds');
     }
 
     for (let txId in unspentOutputs) {
