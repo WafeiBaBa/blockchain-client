@@ -1,10 +1,9 @@
-const logger = require('../util/logger.js');
+const logger = require('../util/logger');
 const blockchain = require('../../blockchain/blockchain');
-const {Transaction} = require('../../blockchain/transaction');
 
 module.exports = function (vorpal) {
   vorpal
-    .command('getbalance', 'Get the list of connected peers.')
+    .command('getbalance', 'Get the balance of someone')
     .alias('g')
     .option('-a, --address <address>',"check the balance of this address")
     .action(function(args, callback) {
@@ -19,7 +18,7 @@ module.exports = function (vorpal) {
           amount += UTXOs[i].value;
         }
 
-        logger.log(`Balance of ${addr}: ${amount}`);
+        logger.log(`💰 Balance of ${addr}: ${amount}`);
         callback();
     })
 };

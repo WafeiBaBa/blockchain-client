@@ -2,14 +2,12 @@ const vorpal = require('vorpal')();
 
 module.exports = function (vorpal) {
   vorpal
-    .use(require('./command/list-blockchain.js'))
-    .use(require('./command/send.js'))
-    .use(require('./command/open-port.js'))
-    .use(require('./command/get-balance.js'))
-    .use(require('./command/connect-peer.js'))
-    .use(require('./command/list-peers.js'))
-    // .use(require('./command/discover-peers.js'))
-    .use(require('./util/welcome.js'))
+    .use(require('./command/list-blockchain'))
+    .use(require('./command/send'))
+    .use(require('./command/open-port'))
+    .use(require('./command/get-balance'))
+    .use(require('./command/connect-peer'))
+    .use(require('./util/welcome'))
     .delimiter('blockchain →')
     .show()
 };

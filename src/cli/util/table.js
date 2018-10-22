@@ -1,5 +1,5 @@
 const Table = require('cli-table2')
-const logger = require('./logger.js');
+const logger = require('./logger');
 const colors = require('colors/safe');
 
 function logBlockchain(blockchain) {
@@ -52,6 +52,8 @@ function logBlockchain(blockchain) {
           obj[`📛  ${colors.red('Hash')}`] = object[key]
         } else if (key === 'nonce') {
           obj[`🔨  ${colors.red('Nonce')}`] = object[key]
+        } else if (key === 'merkleRoot') {
+          obj[`🌴  ${colors.red('MerkleRoot')}`] = object[key]
         }
         table.push(obj)
       }

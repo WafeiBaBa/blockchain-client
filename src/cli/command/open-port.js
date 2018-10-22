@@ -1,5 +1,5 @@
 const p2p = require('../../p2p/p2p');
-const logger = require('../util/logger.js');
+const logger = require('../util/logger');
 
 module.exports = function (vorpal) {
   vorpal

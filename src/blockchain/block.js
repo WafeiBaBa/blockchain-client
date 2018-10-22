@@ -1,8 +1,6 @@
 const {Transaction} = require('./transaction');
-const CryptoJS = require('crypto-js');
 const merkle = require('merkle');
 
-const merkleRoot = merkle('sha256');
 
 
 module.exports = class Block {
@@ -14,7 +12,8 @@ module.exports = class Block {
     this.timestamp = timestamp;
     this.transactionDatas = transactionDatas;
     this.hash = hash.toString();
-    this.nonce = nonce
+    this.nonce = nonce;
+    this.merkleRoot = Block.hashTransactions(this.transactionDatas);
   }
 
   // from object to string
@@ -44,8 +43,11 @@ module.exports = class Block {
     transactionDatas.forEach(transaction => {
       data.push(JSON.stringify(transaction));
     });
-    let tree = merkleRoot.sync(data);
+
+    // use sha256 to create a merkle tree
+    let tree = merkle("sha256").sync(data);
+
+    // return the merkle root
     return tree.root();
   }
-
 };

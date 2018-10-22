@@ -1,4 +1,4 @@
-const logger = require('./logger.js');
+const logger = require('./logger');
 const vorpal = require('vorpal')();
 
 module.exports = function (vorpal) {

@@ -11,6 +11,8 @@ const genesisCoinBaseData = "Genesis Block";
 class Blockchain {
   constructor () {
     this.blockchain = [];
+
+    // there are 24 '0' in the head of hash
     this.difficulty = 2
   }
 
@@ -21,7 +23,7 @@ class Blockchain {
      '0',
       new Date().getTime(),
       transactionDatas,
-      Block.hashTransactions(transactionDatas),
+      "000000F73131ADCC75FB71063046D64D041AF955879AA1D4CBBC98D39DF40D7F",
       12345
     )
   }
@@ -179,7 +181,7 @@ class Blockchain {
     return true
   }
 
-  // generate next block by proof of work
+  // generate next block by proof-of-work
   generateNextBlock (transactionDatas) {
     const previousBlock = this.latestBlock;
     const nextIndex = previousBlock.index + 1;

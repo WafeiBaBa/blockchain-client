@@ -4,9 +4,9 @@ const {Transaction} = require('../../blockchain/transaction');
 
 module.exports = function (vorpal) {
   vorpal
-    .command('send', 'send value')
+    .command('send', 'send value to someone')
     .alias('s')
-    .option('-s, --sendAddress <sendAddress>',"Which address to use")
+    .option('-f, --sendAddress <sendAddress>',"Which address to use")
     .option('-t, --toAddress <toAddress>',"Which address to send")
     .option('-v, --value [value]',"Value")
     .action(function(args, callback) {

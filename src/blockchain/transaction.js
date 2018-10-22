@@ -1,4 +1,5 @@
 const CryptoJS = require('crypto-js');
+const logger = require('../cli/util/logger');
 
 const SUBSIDY = 10;
 
@@ -66,7 +67,8 @@ class Transaction {
     let unspentOutputs = obj.unspentOutputs;
 
     if (acc < amount) {
-      console.error(`ERROR: Not enough funds`);
+      // console.error(`ERROR: Not enough funds`);
+      logger.log(`❌ ERROR: Not enough funds`)
       return;
     }
 
