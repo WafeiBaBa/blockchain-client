@@ -103,7 +103,7 @@ class Blockchain {
 
   // validate the received chain
   isValidChain (blockchainToValidate) {
-    if ((blockchainToValidate[0].hash) !== (Block.genesis.hash)) {
+    if ((blockchainToValidate[0].hash) !== (this.blockchain[0].hash)) {
       return false
     }
 

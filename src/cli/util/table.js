@@ -7,7 +7,7 @@ function logBlockchain(blockchain) {
     const table = new Table({
       style:{border:[],header:[]},
       wordWrap: true,
-      colWidths:[20,100],
+      colWidths:[20,120],
       rowWiths:30
     });
     const object = JSON.parse(JSON.stringify(block))
